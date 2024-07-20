@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
-const signup = async (req, res) => {
+import errorHandler from "../utils/error.js";
+const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
   if (
     !username ||
@@ -10,7 +11,7 @@ const signup = async (req, res) => {
     email === "" ||
     password === ""
   )
-    return res.json({ msg: "please fill required fields" });
+    next(errorHandler(400, "All fields are required"));
   if (password.length < 8)
     return res.json({ msg: "password must be greater than 8 character" });
 
@@ -25,7 +26,7 @@ const signup = async (req, res) => {
     await newUser.save();
     return res.json({ msg: "user registred successfully" });
   } catch (error) {
-    return res.json({ msg: "something went wrong, try again later", error });
+    next(error);
   }
 };
 export { signup };
